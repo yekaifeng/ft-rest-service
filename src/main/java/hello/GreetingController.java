@@ -19,17 +19,11 @@ import io.micrometer.core.instrument.Meter;
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
 
-//import org.springframework.metrics.annotation.Timed;
-//import org.springframework.metrics.instrument.Meter;
-//import org.springframework.metrics.instrument.Counter;
-//import org.springframework.metrics.instrument.MeterRegistry;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 @RestController
 @RequestMapping(value="/greeting")
-//@Timed
 public class GreetingController {
 
     private Integer randomStatus = 200;

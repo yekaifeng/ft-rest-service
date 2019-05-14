@@ -5,7 +5,12 @@
 ### 指定启动端口
 
 ~~~
-    # java -jar target/gs-rest-service-0.1.0.jar --spring.config.location=src/main/resources/application-dev.properties
     # java -jar target/gs-rest-service-0.1.0.jar --server.port=9900
 ~~~
 
+### 指定启动配置文件
+
+~~~
+    # java -jar target/gs-rest-service-0.1.0.jar --spring.config.location=src/main/resources/application-dev.properties
+    # java -jar target/gs-rest-service-0.1.0.jar --spring.profiles.active=dev
+~~~

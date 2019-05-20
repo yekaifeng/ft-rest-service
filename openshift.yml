@@ -1,0 +1,179 @@
+apiVersion: v1
+kind: Template
+metadata:
+  name: ft-rest-service-template
+  annotations:
+    openshift.io/display-name: ft-rest-service
+    tags: "hyperion,demo"
+    iconClass: icon-spring
+    description: "ft-rest-service template"
+    openshift.io/provider-display-name: KennethYe
+labels:
+  app: ft-rest-service
+  app/type: middleware
+
+parameters:
+- description: The version for the application. (latest or 1.0.0)
+  name: VERSION
+  value: latest
+  required: true
+  displayName: Version name
+- description: The name for the application.
+  name: APPLICATION_NAME
+  value: ft-rest-service
+  displayName: Application name
+- description: dev or test
+  name: ENV
+  value: prod
+  required: true
+- description: Image Name
+  name: IMAGE
+  value: docker-registry.default.svc:5000/hyperion/gs-rest-service
+  required: true
+- description: Default subdomain
+  name: SUB_DOMAIN
+  value: apps.openshift.net.cn
+  required: true
+- description: Application Replicas
+  name: REPLICAS
+  value: "1"
+  required: true
+- description: CPU Limit
+  name: CPU_LIMIT
+  value: 2000m
+  required: true
+- description: Memory Limit
+  name: MEM_LIMIT
+  value: 2048Mi
+  required: true
+- description: CPU Request
+  name: CPU_REQUEST
+  value: 100m
+  required: true
+- description: Memory Request
+  name: MEM_REQUEST
+  value: 1024Mi
+  required: true
+- description: Build Time
+  name: BUILD_TIME
+  value:
+  required: false
+- description: Branch Name
+  name: BRANCH_NAME
+  value:
+  required: false
+
+objects:
+
+- kind: Route
+  apiVersion: v1
+  metadata:
+    name: ${APPLICATION_NAME}-route
+  spec:
+    host: ${APPLICATION_NAME}.${SUB_DOMAIN}
+    to:
+      kind: Service
+      name: ${APPLICATION_NAME}
+
+- kind: Service
+  apiVersion: v1
+  metadata:
+    name: ${APPLICATION_NAME}
+    labels:
+      app: ${APPLICATION_NAME}
+    annotations:
+      module: ${APPLICATION_NAME}
+      prometheus.io/scrape: 'true'
+      prometheus.io/scheme: 'http'
+      prometheus.io/port: '8800'
+      prometheus.io/path: '/acurator/prometheus'
+  spec:
+    type: ClusterIP
+    selector:
+      deploymentconfig: "${APPLICATION_NAME}"
+    ports:
+    - name: http
+      port: 8800
+# https://github.com/openshift/origin/issues/10072
+      targetPort: 8800
+
+- kind: DeploymentConfig
+  apiVersion: v1
+  metadata:
+    name: ${APPLICATION_NAME}
+  spec:
+    strategy:
+      type: Rolling
+      rollingParams:
+        updatePeriodSeconds: 1
+        intervalSeconds: 1
+        timeoutSeconds: 600
+      resources: {}
+    replicas: ${REPLICAS}
+    revisionHistoryLimit: 5
+    selector:
+      deploymentconfig: "${APPLICATION_NAME}"
+    template:
+      metadata:
+        labels:
+          deploymentconfig: "${APPLICATION_NAME}"
+          app: "${APPLICATION_NAME}"
+      spec:
+        containers:
+        - name: ${APPLICATION_NAME}
+          image: ${IMAGE}:${VERSION}
+          env:
+            - name: SPRING_PROFILES_ACTIVE
+              value: ${ENV}
+#            - name: APP_OPTS
+#              value: "-Denv=${ENV} -D${ENV}_meta=http://namor-config.${NAMESPACE}:8888"
+            - name: BUILD_TIME
+              value: ${BUILD_TIME}
+            - name: BRANCH_NAME
+              value: ${BRANCH_NAME}
+          ports:
+          - containerPort: 8800
+            name: http
+            protocol: TCP
+          imagePullPolicy: Always
+          readinessProbe:
+            failureThreshold: 10
+            httpGet:
+              path: /actuator/health
+              port: 8800
+              scheme: HTTP
+            initialDelaySeconds: 60
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 5
+          livenessProbe:
+            failureThreshold: 10
+            httpGet:
+              path: /actuator/health
+              port: 8800
+              scheme: HTTP
+            initialDelaySeconds: 120
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 5
+          terminationMessagePath: "/dev/termination-log"
+          resources:
+            limits:
+              memory: ${MEM_LIMIT}
+              cpu: ${CPU_LIMIT}
+            requests:
+              memory: ${MEM_REQUEST}
+              cpu: ${CPU_REQUEST}
+          securityContext:
+            capabilities: {}
+            privileged: false
+        nodeSelector:
+          node-role.kubernetes.io/compute: true
+#          env: ${ENV}
+  triggers:
+      - type: ConfigChange
+      - type: ImageChange
+        imageChange:
+          from:
+            kind: ImageStreamTag
+            name: ${IMAGE}:${VERSION}

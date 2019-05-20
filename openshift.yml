@@ -168,7 +168,7 @@ objects:
             capabilities: {}
             privileged: false
         nodeSelector:
-          node-role.kubernetes.io/compute: true
+          node-role.kubernetes.io/compute: "true"
 #          env: ${ENV}
   triggers:
       - type: ConfigChange

@@ -1,16 +1,11 @@
 FROM fabric8/java-centos-openjdk8-jdk:1.6.3
 MAINTAINER Kennethy <yekaifeng@tom.com>
 
-ENV APP_OPTS=""
-ENV JMX_OPTS=""
-ENV GCLOG_OPTS=""
-
 ENV JAVA_OPTIONS="-Xmx2048m -Xms1024m -XX:NewRatio=1 -XX:+UseConcMarkSweepGC -XX:CMSInitiatingOccupancyFraction=75 \
 -XX:+UseCMSInitiatingOccupancyOnly -XX:ReservedCodeCacheSize=128M -XX:ParallelGCThreads=2 \
 -XX:+ExplicitGCInvokesConcurrent -Duser.timezone=Asia/Shanghai -Djava.security.egd=file:/dev/./urandom \
 ${APP_OPTS} ${JMX_OPTS} ${GCLOG_OPTS}"
 ENV JAVA_APP_JAR="gs-rest-service.jar"
-ENV SPRING_PROFILES_ACTIVE="dev"
 
 USER root
 

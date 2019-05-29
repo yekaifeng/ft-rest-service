@@ -62,8 +62,19 @@ parameters:
   name: BRANCH_NAME
   value:
   required: false
+- description: Log Level (It will be set as ConfigMap)
+  name: LOG_LEVEL
+  value: INFO
+  required: false
 
 objects:
+
+- kind: ConfigMap
+  apiVersion: v1
+  metadata:
+    name: ${APPLICATION_NAME}-env-config
+  data:
+    log_level: ${LOG_LEVEL}
 
 - kind: Route
   apiVersion: v1
@@ -131,6 +142,11 @@ objects:
               value: ${BUILD_TIME}
             - name: BRANCH_NAME
               value: ${BRANCH_NAME}
+            - name: LOG_LEVEL
+              valueFrom:
+                configMapKeyRef:
+                  name: ${APPLICATION_NAME}-env-config
+                  key: log_level
           ports:
           - containerPort: 8800
             name: http

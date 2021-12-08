@@ -1,11 +1,7 @@
 FROM registry.redhat.io/redhat-openjdk-18/openjdk18-openshift:latest
 MAINTAINER Kennethye <kye@redhat.com>
 
-ENV JAVA_OPTIONS="-Xmx2048m -Xms1024m -XX:NewRatio=1 -XX:+UseConcMarkSweepGC -XX:CMSInitiatingOccupancyFraction=75 \
--XX:+UseCMSInitiatingOccupancyOnly -XX:ReservedCodeCacheSize=128M -XX:ParallelGCThreads=2 \
--XX:+ExplicitGCInvokesConcurrent -Duser.timezone=Asia/Shanghai -Djava.security.egd=file:/dev/./urandom \
-${APP_OPTS} ${JMX_OPTS} ${GCLOG_OPTS}"
-#ENV JAVA_APP_JAR="gs-rest-service.jar"
+ENV JAVA_OPTS="-Duser.timezone=Asia/Shanghai -Djava.security.egd=file:/dev/./urandom"
 
 USER root
 COPY . /tmp/src

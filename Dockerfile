@@ -8,7 +8,7 @@ ${APP_OPTS} ${JMX_OPTS} ${GCLOG_OPTS}"
 #ENV JAVA_APP_JAR="gs-rest-service.jar"
 
 USER root
-COPY /tmp/build/inputs /tmp/src
+COPY . /tmp/src
 RUN chown -R 185:0 /tmp/src
 USER 185
 RUN /usr/local/s2i/assemble

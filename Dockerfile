@@ -1,4 +1,4 @@
-FROM java:openjdk-8-el7
+FROM redhat-openjdk-18/openjdk18-openshift
 MAINTAINER Kennethye <kye@redhat.com>
 
 ENV JAVA_OPTIONS="-Xmx2048m -Xms1024m -XX:NewRatio=1 -XX:+UseConcMarkSweepGC -XX:CMSInitiatingOccupancyFraction=75 \

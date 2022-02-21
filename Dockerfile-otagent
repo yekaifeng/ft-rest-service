@@ -1,7 +1,7 @@
 FROM registry.redhat.io/redhat-openjdk-18/openjdk18-openshift:latest
 MAINTAINER Kennethye <kye@redhat.com>
 
-ENV JAVA_OPTS="-Duser.timezone=Asia/Shanghai -Djava.security.egd=file:/dev/./urandom -javaagent:/usr/share/java/opentelemetry-javaagent/opentelemetry-javaagent.jar -Dotel.traces.exporter=otlp -Dotel.exporter.otlp.endpoint=http://otcollector-deployment-collector-headless.open-telemetry.svc:4317"
+ENV JAVA_OPTS="-Duser.timezone=Asia/Shanghai -Djava.security.egd=file:/dev/./urandom -javaagent:/usr/share/java/opentelemetry-javaagent/opentelemetry-javaagent.jar -Dotel.traces.exporter=otlp -Dotel.service.name=ft-rest-service -Dotel.exporter.otlp.endpoint=http://otcollector-deployment-collector-headless.open-telemetry.svc:4317"
 
 USER root
 COPY . /tmp/src

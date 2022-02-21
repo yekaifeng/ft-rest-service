@@ -1,0 +1,16 @@
+FROM registry.redhat.io/redhat-openjdk-18/openjdk18-openshift:latest
+MAINTAINER Kennethye <kye@redhat.com>
+
+ENV JAVA_OPTS="-Duser.timezone=Asia/Shanghai -Djava.security.egd=file:/dev/./urandom -javaagent:/usr/share/java/opentelemetry-javaagent/opentelemetry-javaagent.jar -Dotel.traces.exporter=otlp -Dotel.exporter.otlp.endpoint=http://otcollector-deployment-collector-headless.open-telemetry.svc:4317"
+
+USER root
+COPY . /tmp/src
+RUN mkdir -p /usr/share/java/opentelemetry-javaagent && \
+    curl -L https://github.com/open-telemetry/opentelemetry-java-instrumentation/releases/download/v1.11.0/opentelemetry-javaagent.jar > /usr/share/java/opentelemetry-javaagent/opentelemetry-javaagent.jar
+RUN chown -R 185:0 /tmp/src
+USER 185
+RUN /usr/local/s2i/assemble
+
+
+EXPOSE 8080
+ENTRYPOINT [ "/opt/jboss/container/java/run/run-java.sh", "--spring.profiles.active=${SPRING_PROFILES_ACTIVE}" ]
